@@ -20,6 +20,8 @@ namespace SportsStore
             app.CreatePerOwinContext<StoreRoleManager>(StoreRoleManager.Create);
 
             //app.UseCookieAuthentication(new CookieAuthenticationOptions { AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie });
+
+            app.UseOAuthBearerTokens(new Microsoft.Owin.Security.OAuth.OAuthAuthorizationServerOptions { Provider = new StoreAuthProvider(), AllowInsecureHttp = true, TokenEndpointPath = new PathString("/Authenticate") });
         }
     }
 }

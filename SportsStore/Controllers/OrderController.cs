@@ -1,0 +1,54 @@
+﻿using Microsoft.AspNet.Identity;
+using SportsStore.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Http;
+using System.Web.Security;
+
+namespace SportsStore.Controllers
+{
+    public class OrderController : ApiController
+    {
+        private IRepository Repository { get; set; }
+        public OrderController()
+        {
+            Repository = (IRepository)GlobalConfiguration.Configuration.DependencyResolver.GetService(typeof(IRepository));
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Administrators")]
+        public IEnumerable<Order> List()
+        {
+            return Repository.Orders;
+        }
+
+        public async Task<IHttpActionResult> CreateOrder(Order order)
+        {
+            if (ModelState.IsValid)
+            {
+                await this.Repository.SaveOrderAsync(order);
+                IDictionary<int, Product> products = Repository.Products
+.Where(p => order.Lines.Select(ol => ol.ProductId)
+.Any(id => id == p.Id)).ToDictionary(p => p.Id);
+                order.TotalCost = order.Lines.Sum(ol =>
+                ol.Count * products[ol.ProductId].Price);
+                await Repository.SaveOrderAsync(order);
+                return Ok();
+            }
+            else
+            {
+                return BadRequest(ModelState);
+            }
+        }
+
+        [HttpDelete]
+        [Authorize(Roles = "Administrators")]
+        public async Task DeleteOrder(int id)
+        {
+            await Repository.DeleteOrderAsync(id);
+        }
+    }
+}
