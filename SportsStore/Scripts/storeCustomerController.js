@@ -50,5 +50,43 @@ var placeOrder = function () {
     });
 }
 
+//监视商品变化
+model.products.subscribe(function (newProducts) {
+    filterProductsByCategory();
+    customerModel.productCategories.removeAll();
+    customerModel.productCategories.push.apply(customerModel.productCategories,
+        model.products().map(function (p) {
+            return p.Category;
+        })
+            .filter(function (value, index, self) {
+                return self.indexOf(value) === index;
+            }).sort());
+});
+//监视购物车变化
+customerModel.cart.subscribe(function (newCart) {
+    customerModel.cartTotal(newCart.reduce(
+        function (prev, item) {
+            return prev + (item.count * item.product.Price);
+        }, 0));
+    customerModel.cartCount(newCart.reduce(
+        function (prev, item) {
+            return prev + item.count;
+        }, 0));
+});
+
+//根据类别筛选商品
+var filterProductsByCategory = function () {
+    var category = customerModel.selectedCategory();
+    customerModel.filteredProducts.removeAll();
+    customerModel.filteredProducts.push.apply(customerModel.filteredProducts,
+        model.products().filter(function (p) {
+            return category == null || p.Category == category;
+        }));
+}
+
+$(document).ready(function () {
+    getProducts();
+});
+
 
 

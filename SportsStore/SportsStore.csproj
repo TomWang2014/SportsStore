@@ -239,6 +239,8 @@
     <None Include="Scripts\_references.js" />
     <Content Include="Scripts\storeAjax.js" />
     <Content Include="Scripts\storeCommonController.js" />
+    <Content Include="Scripts\storeCustomerController.js" />
+    <Content Include="Scripts\storeCustomerModel.js" />
     <Content Include="Scripts\storeModel.js" />
     <Content Include="Scripts\storeOrdersController.js" />
     <Content Include="Scripts\storeProductsController.js" />
